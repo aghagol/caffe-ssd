@@ -98,3 +98,4 @@ MANIFEST-*
 jobs
 temp
 examples/*/*lmdb
+proto
