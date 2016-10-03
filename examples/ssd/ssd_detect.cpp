@@ -290,6 +290,7 @@ int main(int argc, char** argv) {
       cv::Mat img = cv::imread(file, -1);
       CHECK(!img.empty()) << "Unable to decode image " << file;
       std::vector<vector<float> > detections = detector.Detect(img);
+      // cv::namedWindow("Image");
 
       /* Print the detection results. */
       for (int i = 0; i < detections.size(); ++i) {
@@ -305,8 +306,16 @@ int main(int argc, char** argv) {
           out << static_cast<int>(d[4] * img.rows) << " ";
           out << static_cast<int>(d[5] * img.cols) << " ";
           out << static_cast<int>(d[6] * img.rows) << std::endl;
+
+          cv::rectangle(img, 
+          	cv::Point( (d[3] * img.cols), (d[4] * img.rows) ), 
+          	cv::Point( (d[5] * img.cols), (d[6] * img.rows) ),
+          	cv::Scalar(255, 0, 0), 1, 8, 0);
         }
       }
+      cv::imshow("Image", img);
+      cv::waitKey(1);
+
     } else if (file_type == "video") {
       cv::VideoCapture cap(file);
       if (!cap.isOpened()) {
