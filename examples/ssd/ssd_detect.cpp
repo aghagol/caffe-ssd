@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <sstream>
 
 #ifdef USE_OPENCV
 using namespace caffe;  // NOLINT(build/namespaces)
@@ -39,8 +40,11 @@ class Detector {
 			const string& mean_value);
 
 	std::vector<vector<float> > Detect(const cv::Mat& img);
+	std::map<int,std::string> label_map;
 
 	private:
+		void MakeLabels(const string& label_file);
+
 		void SetMean(const string& mean_file, const string& mean_value);
 
 		void WrapInputLayer(std::vector<cv::Mat>* input_channels);
@@ -83,6 +87,7 @@ Detector::Detector(
 
 	/* Load the binaryproto mean file. */
 	SetMean(mean_file, mean_value);
+	MakeLabels(label_file);
 }
 
 std::vector<vector<float> > Detector::Detect(const cv::Mat& img) {
@@ -114,6 +119,19 @@ std::vector<vector<float> > Detector::Detect(const cv::Mat& img) {
 		result += 7;
 	}
 	return detections;
+}
+
+void Detector::MakeLabels(const std::string& label_file) {
+	std::ifstream infile(label_file.c_str());
+	std::string line, label_id, label;
+	while (infile >> line) {
+		std::stringstream ss;
+		ss.str(line);
+		std::getline(ss,label_id,',');
+		std::getline(ss,label_id,',');
+		std::getline(ss,label,',');
+		label_map.insert(std::pair<int,std::string>(std::atoi(label_id.c_str()),label));
+	}
 }
 
 /* Load the mean file in binaryproto format. */
@@ -320,10 +338,14 @@ int main(int argc, char** argv) {
 						cv::Point( (d[5] * img.cols), (d[6] * img.rows) ),
 						cv::Scalar(255, 0, 0), 1, 8, 0);
 
-					// cv::putText(img, (d[1]), 
-					// 	cv::Point((d[3] * img.cols), (d[4] * img.rows)), 
-					// 	cv::FONT_HERSHEY_PLAIN, 1.0, 
-					// 	cv::Scalar(255, 0, 0), 2, 8, false);
+					std::stringstream bb_label;
+					bb_label.precision(2);
+					bb_label << detector.label_map[d[1]];
+					// bb_label << "," << score;
+					cv::putText(img, bb_label.str(), 
+						cv::Point((d[3] * img.cols), (d[4] * img.rows)), 
+						cv::FONT_HERSHEY_PLAIN, 1.0, 
+						cv::Scalar(0, 0, 255), 1, 8, false);
 
 				}
 			}
