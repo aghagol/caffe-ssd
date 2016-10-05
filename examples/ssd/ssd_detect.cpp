@@ -382,8 +382,24 @@ int main(int argc, char** argv) {
 						out << static_cast<int>(d[4] * img.rows) << " ";
 						out << static_cast<int>(d[5] * img.cols) << " ";
 						out << static_cast<int>(d[6] * img.rows) << std::endl;
+
+						cv::rectangle(img, 
+						cv::Point( (d[3] * img.cols), (d[4] * img.rows) ), 
+						cv::Point( (d[5] * img.cols), (d[6] * img.rows) ),
+						cv::Scalar(255, 0, 0), 1, 8, 0);
+
+						std::stringstream bb_label;
+						bb_label.precision(2);
+						bb_label << detector.label_map[d[1]];
+						// bb_label << "," << score;
+						cv::putText(img, bb_label.str(), 
+							cv::Point((d[3] * img.cols), (d[4] * img.rows)), 
+							cv::FONT_HERSHEY_PLAIN, 1.0, 
+							cv::Scalar(0, 0, 255), 1, 8, false);
 					}
 				}
+				cv::imshow("Image", img);
+				cv::waitKey(1);
 				++frame_count;
 			}
 			if (cap.isOpened()) {
