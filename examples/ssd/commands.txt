@@ -1,0 +1,9 @@
+./ssd_detect.bin -confidence_threshold .1 -out_file "out.txt" ~/github/ssd/models/VGGNet/coco/SSD_300x300/deploy.prototxt ~/github/ssd/models/VGGNet/coco/SSD_300x300/VGG_coco_SSD_300x300_iter_240000.caffemodel ~/github/ssd/data/coco/labels.txt image_list.txt
+
+./ssd_detect.bin -confidence_threshold .1 -out_file "out.txt" ~/github/ssd/models/VGGNet/VOC0712/SSD_300x300/deploy.prototxt ~/github/ssd/models/VGGNet/VOC0712/SSD_300x300/VGG_VOC0712_SSD_300x300_iter_60000.caffemodel ~/github/ssd/data/VOC0712/labels.txt image_list.txt
+
+./ssd_detect.bin -confidence_threshold .1 -file_type "video" -out_file "out.txt" ~/github/ssd/models/VGGNet/coco/SSD_300x300/deploy.prototxt ~/github/ssd/models/VGGNet/coco/SSD_300x300/VGG_coco_SSD_300x300_iter_240000.caffemodel ~/github/ssd/data/coco/labels.txt video_list.txt
+
+./ssd_detect.bin -confidence_threshold .1 -file_type "video" -out_file "out.txt" ~/github/ssd/models/VGGNet/VOC0712/SSD_300x300/deploy.prototxt ~/github/ssd/models/VGGNet/VOC0712/SSD_300x300/VGG_VOC0712_SSD_300x300_iter_60000.caffemodel ~/github/ssd/data/VOC0712/labels.txt video_list.txt
+
+
