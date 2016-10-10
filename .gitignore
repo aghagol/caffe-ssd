@@ -67,6 +67,7 @@ models/*
 *.binaryproto
 *leveldb
 *lmdb
+*.mp4
 
 # build, distribute, and bins (+ python proto bindings)
 build
