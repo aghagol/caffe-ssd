@@ -312,6 +312,7 @@ int main(int argc, char** argv) {
 	std::ifstream infile(argv[4]);
 	std::string file;
 	while (infile >> file) {
+		if (file[0] == '#') {continue;} //ignore lines that start with '#'
 		if (file_type == "image") {
 			cv::Mat img = cv::imread(file, -1);
 			CHECK(!img.empty()) << "Unable to decode image " << file;
@@ -365,11 +366,21 @@ int main(int argc, char** argv) {
 					break;
 				}
 				CHECK(!img.empty()) << "Error when read frame";
+
+				// img = img(cv::Rect(500,500,2000,2000));
+				cv::resize(img, img, cv::Size(), .5, .5);
+
 				std::vector<vector<float> > detections = detector.Detect(img);
 
 				/* Print the detection results. */
 				for (int i = 0; i < detections.size(); ++i) {
 					const vector<float>& d = detections[i];
+
+					// if (d[1] > 10) {continue;}
+					if (d[1] != 1) {continue;} //only detect people
+					// if ((d[5]-d[3])/(d[6]-d[4]) < .5) {continue;} //people standing
+					// if ((d[5]-d[3]) > .5) {continue;} //small objects
+
 					// Detection format: [image_id, label, score, xmin, ymin, xmax, ymax].
 					CHECK_EQ(d.size(), 7);
 					const float score = d[2];
@@ -389,10 +400,11 @@ int main(int argc, char** argv) {
 						cv::Scalar(255, 0, 0), 1, 8, 0);
 
 						std::stringstream bb_label;
-						bb_label.precision(2);
+						bb_label.precision(1);
 						bb_label << detector.label_map[d[1]];
-						// bb_label << "," << score;
+						// bb_label << ", " << score;
 						cv::putText(img, bb_label.str(), 
+						// cv::putText(img, score,
 							cv::Point((d[3] * img.cols), (d[4] * img.rows)), 
 							cv::FONT_HERSHEY_PLAIN, 1.0, 
 							cv::Scalar(0, 0, 255), 1, 8, false);
