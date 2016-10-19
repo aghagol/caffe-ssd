@@ -291,8 +291,7 @@ int main(int argc, char** argv) {
 	const string& mean_value = FLAGS_mean_value;
 	const string& file_type = FLAGS_file_type;
 	const string& out_file = FLAGS_out_file;
-	// const float confidence_threshold = FLAGS_confidence_threshold;
-	float confidence_threshold = FLAGS_confidence_threshold;
+	const float confidence_threshold = FLAGS_confidence_threshold;
 
 	// Initialize the network.
 	Detector detector(model_file, weights_file, label_file, mean_file, mean_value);
@@ -358,9 +357,6 @@ int main(int argc, char** argv) {
 			if (!cap.isOpened()) {
 				LOG(FATAL) << "Failed to open video: " << file;
 			}
-			// cv::VideoWriter outvid;
-			// outvid.open("/home/mo/github/ssd/build/examples/ssd/outvid.avi",-1,30,cv::Size(1920,1080),true);
-
 			cv::Mat img;
 			int frame_count = 0;
 			while (true) {
@@ -371,8 +367,8 @@ int main(int argc, char** argv) {
 				}
 				CHECK(!img.empty()) << "Error when read frame";
 
-				// img = img(cv::Rect(600,500,200,200));
-				// cv::resize(img, img, cv::Size(), .9, .9);
+				// img = img(cv::Rect(500,500,2000,2000));
+				cv::resize(img, img, cv::Size(), .5, .5);
 
 				std::vector<vector<float> > detections = detector.Detect(img);
 
@@ -380,19 +376,10 @@ int main(int argc, char** argv) {
 				for (int i = 0; i < detections.size(); ++i) {
 					const vector<float>& d = detections[i];
 
-					confidence_threshold=.2;
-
 					// if (d[1] > 10) {continue;}
-					// if (d[1] == 1) {
-					// 	confidence_threshold=.1;
-					// }
-					// else{
-					// 	confidence_threshold=.2;
-					// }
-					if (d[1]==25) {confidence_threshold=.1;}
+					if (d[1] != 1) {continue;} //only detect people
 					// if ((d[5]-d[3])/(d[6]-d[4]) < .5) {continue;} //people standing
-					if ((d[5]-d[3]) > .8) {continue;} //distant objects
-					if ((d[6]-d[4]) > .8) {continue;} //distant objects
+					// if ((d[5]-d[3]) > .5) {continue;} //small objects
 
 					// Detection format: [image_id, label, score, xmin, ymin, xmax, ymax].
 					CHECK_EQ(d.size(), 7);
@@ -410,7 +397,7 @@ int main(int argc, char** argv) {
 						cv::rectangle(img, 
 						cv::Point( (d[3] * img.cols), (d[4] * img.rows) ), 
 						cv::Point( (d[5] * img.cols), (d[6] * img.rows) ),
-						cv::Scalar(0, 0, 255), 2, 8, 0);
+						cv::Scalar(255, 0, 0), 1, 8, 0);
 
 						std::stringstream bb_label;
 						bb_label.precision(1);
@@ -419,16 +406,12 @@ int main(int argc, char** argv) {
 						cv::putText(img, bb_label.str(), 
 						// cv::putText(img, score,
 							cv::Point((d[3] * img.cols), (d[4] * img.rows)), 
-							cv::FONT_HERSHEY_PLAIN, 2, 
-							cv::Scalar(255, 0, 0), 2, 8, false);
+							cv::FONT_HERSHEY_PLAIN, 1.0, 
+							cv::Scalar(0, 0, 255), 1, 8, false);
 					}
 				}
 				cv::imshow("Image", img);
-
-				// outvid.write(img);
-
 				cv::waitKey(1);
-
 				++frame_count;
 			}
 			if (cap.isOpened()) {

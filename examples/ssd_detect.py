@@ -54,16 +54,17 @@ transformer.set_channel_swap('data', (2,1,0))  # the reference model has channel
 image_resize = 300
 net.blobs['data'].reshape(1,3,image_resize,image_resize)
 
-image_path = '/home/mo/Desktop/ROS_data/jaguar/2016-07-22/train/left/'
+# image_path = '/home/mo/Desktop/ROS_data/jaguar/2016-07-22/train/left/'
 # image_path = '/home/mo/Desktop/ROS_data/jaguar/2016-09-16/train/left/'
-# image_list = [float(i[:-4]) for i in os.listdir(image_path) if i.endswith('png')]
-# image_list.sort()
-image_list = np.loadtxt(open('/home/mo/Desktop/ROS_data/jaguar/2016-07-22/dataset_train_nn.txt'))[:,0]
+image_path = '/home/mo/Desktop/security_cam/SLR/MVI_0886/'
+image_list = [float(i[:-4]) for i in os.listdir(image_path) if i.endswith('jpg')]
+image_list.sort()
+# image_list = np.loadtxt(open('/home/mo/Desktop/ROS_data/jaguar/2016-07-22/dataset_train_nn.txt'))[:,0]
 
 for image_idx, image_time in enumerate(image_list):
 	# if image_idx%10: continue
 
-	image = caffe.io.load_image(image_path+'%f.png'%image_time)
+	image = caffe.io.load_image(image_path+'%010d.jpg'%image_time)
 	plt.imshow(image)
 
 	transformed_image = transformer.preprocess('data', image)
@@ -81,7 +82,7 @@ for image_idx, image_time in enumerate(image_list):
 	det_ymax = detections[0,0,:,6]
 
 	# Get detections with confidence higher than 0.6.
-	top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.3]
+	top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.1]
 
 	top_conf = det_conf[top_indices]
 	top_label_indices = det_label[top_indices].tolist()
